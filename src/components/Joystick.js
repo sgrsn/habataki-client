@@ -39,10 +39,11 @@ const Joystick = () => {
       // Use transform3d for better performance
       joystick.style.transform = `translate3d(calc(-50% + ${x * 50}px), calc(-50% + ${y * 50}px), 0)`;
 
-      // Throttle MQTT publishing to every 50ms
+      // Throttle MQTT publishing to every 100ms
       const now = Date.now();
-      if (now - lastPublishRef.current > 50) {
-        mqttService.publish('control/joystick', { x, y });
+      if (now - lastPublishRef.current > 100) {
+        mqttService.publish('control/joystick/x', x);
+        mqttService.publish('control/joystick/y', y);
         lastPublishRef.current = now;
       }
     };
@@ -86,7 +87,8 @@ const Joystick = () => {
         }, 50);
       }
       position.current = { x: 0, y: 0 };
-      mqttService.publish('control/joystick', { x: 0, y: 0 });
+      mqttService.publish('control/joystick/x', 0.0);
+      mqttService.publish('control/joystick/y', 0.0);
     };
 
     const container = containerRef.current;

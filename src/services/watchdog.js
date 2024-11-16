@@ -62,11 +62,7 @@ class WatchdogService {
     const timeSinceLastHeartbeat = currentTime - this.lastHeartbeatTime;
     
     const heartbeatData = {
-      deviceId: this.deviceId,
-      status: 'alive',
-      timestamp: currentTime,
-      interval: timeSinceLastHeartbeat,
-      userAgent: navigator.userAgent
+      timestamp: currentTime
     };
 
     mqttService.publish('watchdog/heartbeat', heartbeatData);
