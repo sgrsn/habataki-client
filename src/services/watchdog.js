@@ -5,12 +5,14 @@ class WatchdogService {
     this.interval = null;
     this.isRunning = false;
     this.lastHeartbeatTime = Date.now();
-    this.heartbeatInterval = 1000; // 1秒ごとにハートビートを送信
-    this.deviceId = this.generateDeviceId(); // デバイスごとに一意のIDを生成
+    this.lastReceivedHeartbeat = null;
+    this.heartbeatInterval = 500;
+    this.deviceId = this.generateDeviceId();
+    this.connectionTimeout = this.heartbeatInterval * 3; // 3回分のハートビートを受信できなかった場合はタイムアウト
+    this.connectionCheckInterval = null;
   }
 
   generateDeviceId() {
-    // ブラウザのユーザーエージェントと時刻からハッシュを生成
     const str = navigator.userAgent + Date.now();
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -21,11 +23,19 @@ class WatchdogService {
     return `device_${Math.abs(hash).toString(16)}`;
   }
 
+  init() {
+    // ハートビートメッセージの購読を開始
+    mqttService.subscribe('watchdog/heartbeat', (message) => {
+      this.handleHeartbeat(message);
+    });
+  }
+
   start() {
     if (this.isRunning) return;
 
     this.isRunning = true;
     this.lastHeartbeatTime = Date.now();
+    this.lastReceivedHeartbeat = Date.now();
 
     // 初回のハートビートを即座に送信
     this.sendHeartbeat();
@@ -34,6 +44,9 @@ class WatchdogService {
     this.interval = setInterval(() => {
       this.sendHeartbeat();
     }, this.heartbeatInterval);
+
+    // 接続状態の監視を開始
+    this.startConnectionMonitoring();
 
     console.log('Watchdog service started');
   }
@@ -46,10 +59,17 @@ class WatchdogService {
       this.interval = null;
     }
 
+    if (this.connectionCheckInterval) {
+      clearInterval(this.connectionCheckInterval);
+      this.connectionCheckInterval = null;
+    }
+
+    // ハートビートの購読を解除
+    mqttService.unsubscribe('watchdog/heartbeat');
+
     this.isRunning = false;
     console.log('Watchdog service stopped');
 
-    // 停止メッセージを送信
     mqttService.publish('watchdog/status', {
       deviceId: this.deviceId,
       status: 'stopped',
@@ -57,43 +77,58 @@ class WatchdogService {
     });
   }
 
+  handleHeartbeat(message) {
+    this.lastReceivedHeartbeat = Date.now();
+    console.log('Received heartbeat:', message);
+  }
+
+  startConnectionMonitoring() {
+    this.connectionCheckInterval = setInterval(() => {
+      const timeSinceLastHeartbeat = Date.now() - this.lastReceivedHeartbeat;
+      if (timeSinceLastHeartbeat > this.connectionTimeout) {
+        console.warn('Connection timeout detected - No heartbeat received');
+        this.handleConnectionTimeout();
+      }
+    }, this.heartbeatInterval);
+  }
+
+  handleConnectionTimeout() {
+    // 接続タイムアウト時の処理をここに実装
+    // 例: 再接続の試行、エラーイベントの発行など
+    console.error('Connection timeout - Reconnecting...');
+    mqttService.connect();
+  }
+
   sendHeartbeat() {
     const currentTime = Date.now();
-    const timeSinceLastHeartbeat = currentTime - this.lastHeartbeatTime;
-    
-    const heartbeatData = {
-      timestamp: currentTime
-    };
-
-    mqttService.publish('watchdog/heartbeat', heartbeatData);
+    mqttService.publish('watchdog/heartbeat', currentTime);
     this.lastHeartbeatTime = currentTime;
   }
 
-  // ハートビート間隔を変更する（ミリ秒単位）
   setHeartbeatInterval(interval) {
-    if (interval < 100) { // 最小間隔を100msに制限
+    if (interval < 100) {
       interval = 100;
     }
     
     this.heartbeatInterval = interval;
+    this.connectionTimeout = interval * 3;
     
-    // サービスが実行中の場合は再起動して新しい間隔を適用
     if (this.isRunning) {
       this.stop();
       this.start();
     }
   }
 
-  // 現在の状態を取得
   getStatus() {
     return {
       isRunning: this.isRunning,
       deviceId: this.deviceId,
       heartbeatInterval: this.heartbeatInterval,
-      lastHeartbeatTime: this.lastHeartbeatTime
+      lastHeartbeatTime: this.lastHeartbeatTime,
+      lastReceivedHeartbeat: this.lastReceivedHeartbeat,
+      connectionTimeout: this.connectionTimeout
     };
   }
 }
 
-// シングルトンインスタンスをエクスポート
 export const watchdogService = new WatchdogService();

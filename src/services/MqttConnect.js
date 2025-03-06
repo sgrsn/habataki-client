@@ -5,6 +5,7 @@ class MQTTService {
   constructor() {
     this.client = null;
     this.connected = false;
+    this.subscriptions = new Map();
   }
 
   connect() {
@@ -14,17 +15,34 @@ class MQTTService {
     this.client = mqtt.connect(url, {
       username,
       password,
-      protocol: 'ws', // WebSocket プロトコルを使用
+      protocol: 'ws',
     });
 
     this.client.on('connect', () => {
       console.log('Connected to MQTT broker');
       this.connected = true;
+      
+      // 再接続時に既存のサブスクリプションを再購読
+      this.subscriptions.forEach((callback, topic) => {
+        this.client.subscribe(topic);
+      });
     });
 
     this.client.on('error', (error) => {
       console.error('MQTT error:', error);
       this.connected = false;
+    });
+
+    this.client.on('message', (topic, message) => {
+      const callback = this.subscriptions.get(topic);
+      if (callback) {
+        try {
+          const parsedMessage = JSON.parse(message.toString());
+          callback(parsedMessage);
+        } catch (error) {
+          console.error('Error parsing message:', error);
+        }
+      }
     });
   }
 
@@ -34,10 +52,25 @@ class MQTTService {
     }
   }
 
+  subscribe(topic, callback) {
+    if (this.client) {
+      this.client.subscribe(topic);
+      this.subscriptions.set(topic, callback);
+    }
+  }
+
+  unsubscribe(topic) {
+    if (this.client) {
+      this.client.unsubscribe(topic);
+      this.subscriptions.delete(topic);
+    }
+  }
+
   disconnect() {
     if (this.client) {
       this.client.end();
       this.connected = false;
+      this.subscriptions.clear();
     }
   }
 }

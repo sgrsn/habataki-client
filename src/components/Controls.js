@@ -7,14 +7,14 @@ const Controls = () => {
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
-    mqttService.publish('control/startStop', { running: !isRunning });
+    mqttService.publish('control/startStop', !isRunning);
   };
 
   const handleSliderChange = (event) => {
     event.stopPropagation();  // イベントの伝播を止める
-    const value = parseInt(event.target.value);
+    const value = parseFloat(event.target.value);
     setSliderValue(value);
-    mqttService.publish('control/slider', { value });
+    mqttService.publish('control/slider', value);
   };
 
   const handleTouchStart = (e) => {
@@ -25,7 +25,7 @@ const Controls = () => {
     <div className="flex flex-col gap-6">
       <button
         onClick={handleStartStop}
-        className={`h-24 text-2xl rounded-xl text-white font-bold shadow-lg active:shadow-sm transition-all ${
+        className={`h-40 text-2xl rounded-xl text-white font-bold shadow-lg active:shadow-sm transition-all ${
           isRunning ? 'bg-red-500 active:bg-red-600' : 'bg-green-500 active:bg-green-600'
         }`}
       >
@@ -42,7 +42,7 @@ const Controls = () => {
           onChange={handleSliderChange}
           onTouchStart={handleTouchStart}
           onMouseDown={(e) => e.stopPropagation()}
-          className="w-full h-8 rounded-lg appearance-none bg-gray-300 
+          className="w-full h-10 rounded-lg appearance-none bg-gray-300 
             [&::-webkit-slider-thumb]:appearance-none 
             [&::-webkit-slider-thumb]:w-8 
             [&::-webkit-slider-thumb]:h-8 
