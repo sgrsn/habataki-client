@@ -8,7 +8,10 @@ const useGamepad = () => {
     buttons: {},
     isConnected: false,
     lastButtonA: false,
-    lastButtonB: false
+    lastButtonB: false,
+    lastButtonPlus: false,
+    lastButtonMinus: false,
+    sliderValue: 50 // スライダーの初期値を50に設定
   });
 
   useEffect(() => {
@@ -23,6 +26,8 @@ const useGamepad = () => {
         const now = Date.now();
         const buttonA = gamepad.buttons[0]?.pressed || false;
         const buttonB = gamepad.buttons[1]?.pressed || false;
+        const buttonPlus = gamepad.buttons[4]?.pressed || false;
+        const buttonMinus = gamepad.buttons[5]?.pressed || false;
 
         const newState = {
           leftStick: {
@@ -36,7 +41,10 @@ const useGamepad = () => {
           buttons: gamepad.buttons.map(btn => btn.pressed),
           isConnected: true,
           lastButtonA: buttonA,
-          lastButtonB: buttonB
+          lastButtonB: buttonB,
+          lastButtonPlus: buttonPlus,
+          lastButtonMinus: buttonMinus,
+          sliderValue: gamepadState.sliderValue
         };
 
         setGamepadState(prevState => {
@@ -46,6 +54,14 @@ const useGamepad = () => {
           }
           if (buttonB && !prevState.lastButtonB) {
             mqttService.publish('control/startStop', false);
+          }
+          if (buttonPlus && !prevState.lastButtonPlus) {
+            const newSliderValue = Math.min(100, prevState.sliderValue + 10);
+            mqttService.publish('control/slider', newSliderValue);
+          }
+          if (buttonMinus && !prevState.lastButtonMinus) {
+            const newSliderValue = Math.max(0, prevState.sliderValue - 10);
+            mqttService.publish('control/slider', newSliderValue);
           }
           return newState;
         });
