@@ -45,7 +45,7 @@ const useGamepad = () => {
           lastButtonB: buttonB,
           lastButtonPlus: buttonPlus,
           lastButtonMinus: buttonMinus,
-          sliderValue: prevState.sliderValue
+          sliderValue: gamepadState.sliderValue
         };
 
         setGamepadState(prevState => {
