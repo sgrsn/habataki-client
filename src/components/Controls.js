@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mqttService } from '../services/MqttConnect';
+import useGamepad from '../hooks/useGamepad';
 
 const Controls = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [sliderValue, setSliderValue] = useState(50);
+const gamepadState = useGamepad();
+
+useEffect(() => {
+  if (gamepadState.sliderValue !== undefined) {
+    setSliderValue(gamepadState.sliderValue);
+  }
+}, [gamepadState.sliderValue]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);

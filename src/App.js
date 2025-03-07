@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Controls from './components/Controls';
 import Joystick from './components/Joystick';
 import JoystickPosition from './components/JoystickPosition';
+import GamepadStatus from './components/GamepadStatus';
 import { mqttService } from './services/MqttConnect';
 import { watchdogService } from './services/watchdog';
 
@@ -51,6 +52,7 @@ const App = () => {
       <Joystick />
     </div>
     <div className="fixed bottom-0 left-0 right-0 bg-white p-2 shadow-lg">
+      <GamepadStatus />
     </div>
   </div>
   );

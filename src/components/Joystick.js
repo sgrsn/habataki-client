@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { mqttService } from '../services/MqttConnect';
+import useGamepad from '../hooks/useGamepad';
 
 const Joystick = () => {
   const joystickRef = useRef(null);
@@ -8,6 +9,7 @@ const Joystick = () => {
   const position = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef(null);
   const lastPublishRef = useRef(0);
+  const gamepadState = useGamepad();
 
   useEffect(() => {
     let rect = null;
