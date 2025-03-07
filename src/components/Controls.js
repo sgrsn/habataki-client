@@ -3,9 +3,17 @@ import { mqttService } from '../services/MqttConnect';
 import useGamepad from '../hooks/useGamepad';
 
 const Controls = () => {
+  const gamepadState = useGamepad();
   const [isRunning, setIsRunning] = useState(false);
   const [sliderValue, setSliderValue] = useState(50);
-const gamepadState = useGamepad();
+
+  useEffect(() => {
+    if (gamepadState.lastButtonA && !gamepadState.lastButtonB) {
+      setIsRunning(true);
+    } else if (!gamepadState.lastButtonA && gamepadState.lastButtonB) {
+      setIsRunning(false);
+    }
+  }, [gamepadState.lastButtonA, gamepadState.lastButtonB]);
 
 useEffect(() => {
   if (gamepadState.sliderValue !== undefined) {
