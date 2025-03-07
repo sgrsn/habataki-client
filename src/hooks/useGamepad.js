@@ -22,6 +22,7 @@ const useGamepad = () => {
     const handleGamepadInput = () => {
       const gamepads = navigator.getGamepads();
       const gamepad = gamepads[0]; // MFIコントローラーは通常index 0に接続される
+        console.log('Gamepad buttons:', gamepad.buttons.map((btn, idx) => ({ index: idx, pressed: btn.pressed })));
 
       if (gamepad) {
         const now = Date.now();
@@ -45,7 +46,7 @@ const useGamepad = () => {
           lastButtonB: buttonB,
           lastButtonPlus: buttonPlus,
           lastButtonMinus: buttonMinus,
-          sliderValue: 0 // Will be updated in setGamepadState
+          sliderValue: gamepadState.sliderValue // Keep the previous slider value
         };
 
         setGamepadState(prevState => {
