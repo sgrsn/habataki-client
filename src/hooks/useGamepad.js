@@ -27,8 +27,8 @@ const useGamepad = () => {
         const now = Date.now();
         const buttonA = gamepad.buttons[0]?.pressed || false;
         const buttonB = gamepad.buttons[1]?.pressed || false;
-        const buttonPlus = gamepad.buttons[10]?.pressed || false;
-        const buttonMinus = gamepad.buttons[11]?.pressed || false;
+        const buttonPlus = gamepad.buttons[11]?.pressed || false;
+        const buttonMinus = gamepad.buttons[10]?.pressed || false;
 
         const newState = {
           leftStick: {
@@ -58,11 +58,11 @@ const useGamepad = () => {
           }
           let newSliderValue = prevState.sliderValue;
           if (buttonPlus) {
-            newSliderValue = Math.min(100, prevState.sliderValue + 10);
+            newSliderValue = Math.min(100, prevState.sliderValue + 1);
             mqttService.publish('control/slider', newSliderValue);
           }
           if (buttonMinus) {
-            newSliderValue = Math.max(0, prevState.sliderValue - 10);
+            newSliderValue = Math.max(0, prevState.sliderValue - 1);
             mqttService.publish('control/slider', newSliderValue);
           }
           return {
