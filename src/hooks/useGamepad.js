@@ -11,7 +11,8 @@ const useGamepad = () => {
     lastButtonB: false,
     lastButtonPlus: false,
     lastButtonMinus: false,
-    sliderValue: 50 // スライダーの初期値を50に設定
+    sliderValue: 50, // スライダーの初期値を50に設定
+    lastPublishTime: 0
   });
 
   useEffect(() => {
@@ -26,8 +27,8 @@ const useGamepad = () => {
         const now = Date.now();
         const buttonA = gamepad.buttons[0]?.pressed || false;
         const buttonB = gamepad.buttons[1]?.pressed || false;
-        const buttonPlus = gamepad.buttons[4]?.pressed || false;
-        const buttonMinus = gamepad.buttons[5]?.pressed || false;
+        const buttonPlus = gamepad.buttons[10]?.pressed || false;
+        const buttonMinus = gamepad.buttons[11]?.pressed || false;
 
         const newState = {
           leftStick: {
@@ -44,7 +45,7 @@ const useGamepad = () => {
           lastButtonB: buttonB,
           lastButtonPlus: buttonPlus,
           lastButtonMinus: buttonMinus,
-          sliderValue: gamepadState.sliderValue
+          sliderValue: Math.round(gamepad.axes[4] * 50 + 50) // Map axis value from [-1,1] to [0,100]
         };
 
         setGamepadState(prevState => {
@@ -67,10 +68,10 @@ const useGamepad = () => {
         });
 
         // 100ms毎にジョイスティックの値をMQTTメッセージとして送信
-        if (now - lastPublishTime > 100) {
+        if (now - gamepadState.lastPublishTime > 100) {
           mqttService.publish('control/joystick/x', newState.leftStick.x);
           mqttService.publish('control/joystick/y', newState.leftStick.y);
-          lastPublishTime = now;
+          newState.lastPublishTime = now;
         }
       }
 
