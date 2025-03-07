@@ -45,7 +45,7 @@ const useGamepad = () => {
           lastButtonB: buttonB,
           lastButtonPlus: buttonPlus,
           lastButtonMinus: buttonMinus,
-          sliderValue: gamepadState.sliderValue
+          sliderValue: 0 // Will be updated in setGamepadState
         };
 
         setGamepadState(prevState => {
@@ -56,15 +56,19 @@ const useGamepad = () => {
           if (buttonB && !prevState.lastButtonB) {
             mqttService.publish('control/startStop', false);
           }
+          let newSliderValue = prevState.sliderValue;
           if (buttonPlus) {
-            const newSliderValue = Math.min(100, prevState.sliderValue + 10);
+            newSliderValue = Math.min(100, prevState.sliderValue + 10);
             mqttService.publish('control/slider', newSliderValue);
           }
           if (buttonMinus) {
-            const newSliderValue = Math.max(0, prevState.sliderValue - 10);
+            newSliderValue = Math.max(0, prevState.sliderValue - 10);
             mqttService.publish('control/slider', newSliderValue);
           }
-          return newState;
+          return {
+            ...newState,
+            sliderValue: newSliderValue
+          };
         });
 
         // 100ms毎にジョイスティックの値をMQTTメッセージとして送信
