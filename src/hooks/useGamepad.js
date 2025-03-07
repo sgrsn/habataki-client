@@ -45,7 +45,7 @@ const useGamepad = () => {
           lastButtonB: buttonB,
           lastButtonPlus: buttonPlus,
           lastButtonMinus: buttonMinus,
-          sliderValue: Math.round(gamepad.axes[4] * 50 + 50) // Map axis value from [-1,1] to [0,100]
+          sliderValue: prevState.sliderValue
         };
 
         setGamepadState(prevState => {
