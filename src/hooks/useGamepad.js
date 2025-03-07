@@ -56,11 +56,11 @@ const useGamepad = () => {
           if (buttonB && !prevState.lastButtonB) {
             mqttService.publish('control/startStop', false);
           }
-          if (buttonPlus && !prevState.lastButtonPlus) {
+          if (buttonPlus) {
             const newSliderValue = Math.min(100, prevState.sliderValue + 10);
             mqttService.publish('control/slider', newSliderValue);
           }
-          if (buttonMinus && !prevState.lastButtonMinus) {
+          if (buttonMinus) {
             const newSliderValue = Math.max(0, prevState.sliderValue - 10);
             mqttService.publish('control/slider', newSliderValue);
           }
