@@ -3,6 +3,7 @@ import Controls from './components/Controls';
 import Joystick from './components/Joystick';
 import JoystickPosition from './components/JoystickPosition';
 import GamepadStatus from './components/GamepadStatus';
+import HeartbeatStatus from './components/HeartbeatStatus';
 import { mqttService } from './services/MqttConnect';
 import { watchdogService } from './services/watchdog';
 
@@ -51,8 +52,9 @@ const App = () => {
          }}>
       <Joystick />
     </div>
-    <div className="fixed bottom-0 left-0 right-0 bg-white p-2 shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 bg-white p-2 shadow-lg space-y-2">
       <GamepadStatus />
+      <HeartbeatStatus />
     </div>
   </div>
   );
