@@ -32,12 +32,12 @@ const useGamepad = () => {
 
         const newState = {
           leftStick: {
-            x: Math.round(gamepad.axes[0] * 100),
-            y: Math.round(-gamepad.axes[1] * 100) // Y軸は反転
+            x: Math.round(-gamepad.axes[0] * 100),
+            y: Math.round(gamepad.axes[1] * 100) // Y軸は反転
           },
           rightStick: {
-            x: Math.round(gamepad.axes[2] * 100),
-            y: Math.round(-gamepad.axes[3] * 100)
+            x: Math.round(-gamepad.axes[2] * 100),
+            y: Math.round(gamepad.axes[3] * 100)
           },
           buttons: gamepad.buttons.map(btn => btn.pressed),
           isConnected: true,
@@ -52,31 +52,38 @@ const useGamepad = () => {
           // ボタンの状態が変化した時のみMQTTメッセージを送信
           if (buttonA && !prevState.lastButtonA) {
             mqttService.publish('control/startStop', true);
+            console.log('Start');
           }
           if (buttonB && !prevState.lastButtonB) {
             mqttService.publish('control/startStop', false);
+            console.log('Stop');
           }
           let newSliderValue = prevState.sliderValue;
           if (buttonPlus) {
             newSliderValue = Math.min(100, prevState.sliderValue + 1);
-            mqttService.publish('control/slider', newSliderValue);
           }
           if (buttonMinus) {
             newSliderValue = Math.max(0, prevState.sliderValue - 1);
-            mqttService.publish('control/slider', newSliderValue);
           }
+
+          // 100ms毎にジョイスティックの値をMQTTメッセージとして送信
+          if ((now - gamepadState.lastPublishTime) > 200) {
+            mqttService.publish('control/joystick/x', newState.leftStick.x);
+            mqttService.publish('control/joystick/y', newState.leftStick.y);
+            mqttService.publish('control/slider', newSliderValue);
+            gamepadState.lastPublishTime = now;
+            console.log('sliderValue:', newSliderValue);
+            console.log('joystickX:', newState.leftStick.x);
+            console.log('joystickY:', newState.leftStick.y);
+          }
+
           return {
             ...newState,
             sliderValue: newSliderValue
           };
         });
 
-        // 100ms毎にジョイスティックの値をMQTTメッセージとして送信
-        if (now - gamepadState.lastPublishTime > 100) {
-          mqttService.publish('control/joystick/x', newState.leftStick.x);
-          mqttService.publish('control/joystick/y', newState.leftStick.y);
-          newState.lastPublishTime = now;
-        }
+        
       }
 
       animationFrameId = requestAnimationFrame(handleGamepadInput);
