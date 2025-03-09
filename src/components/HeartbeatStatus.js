@@ -6,7 +6,7 @@ const HeartbeatStatus = () => {
 
   useEffect(() => {
     const handleHeartbeat = (message) => {
-      setLastHeartbeat(new Date().toLocaleTimeString());
+      setLastHeartbeat(message);
     };
 
     mqttService.subscribe('robot/heartbeat', handleHeartbeat);
