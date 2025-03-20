@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { mqttService } from '../services/MqttConnect';
 
-const useGamepad = () => {
+const useGamepad = (enableMqtt = false) => {
   const [gamepadState, setGamepadState] = useState({
     leftStick: { x: 0, y: 0 },
     rightStick: { x: 0, y: 0 },
@@ -66,15 +66,20 @@ const useGamepad = () => {
             newSliderValue = Math.max(0, prevState.sliderValue - 1);
           }
 
-          // 100ms毎にジョイスティックの値をMQTTメッセージとして送信
-          if ((now - gamepadState.lastPublishTime) > 200) {
+          // 100ms毎にジョイスティックの値をMQTTメッセージとして送信（enableMqttがtrueの場合のみ）
+          if (enableMqtt && (now - prevState.lastPublishTime) > 200) {
             mqttService.publish('control/joystick/x', newState.leftStick.x);
             mqttService.publish('control/joystick/y', newState.leftStick.y);
             mqttService.publish('control/slider', newSliderValue);
-            gamepadState.lastPublishTime = now;
+            console.log('Publishing MQTT message at:', new Date().toISOString());
             console.log('sliderValue:', newSliderValue);
             console.log('joystickX:', newState.leftStick.x);
             console.log('joystickY:', newState.leftStick.y);
+            return {
+              ...newState,
+              sliderValue: newSliderValue,
+              lastPublishTime: now
+            };
           }
 
           return {

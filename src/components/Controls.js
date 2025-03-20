@@ -3,7 +3,7 @@ import { mqttService } from '../services/MqttConnect';
 import useGamepad from '../hooks/useGamepad';
 
 const Controls = () => {
-  const gamepadState = useGamepad();
+  const gamepadState = useGamepad(true); // MQTTを有効化
   const [isRunning, setIsRunning] = useState(false);
   const [sliderValue, setSliderValue] = useState(50);
 

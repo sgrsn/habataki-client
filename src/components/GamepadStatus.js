@@ -2,7 +2,7 @@ import React from 'react';
 import useGamepad from '../hooks/useGamepad';
 
 const GamepadStatus = () => {
-  const gamepadState = useGamepad();
+  const gamepadState = useGamepad(false); // Disable MQTT
 
   return (
     <div className="text-sm text-gray-600 mt-2">
