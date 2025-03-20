@@ -44,8 +44,9 @@ const Joystick = () => {
       // Throttle MQTT publishing to every 100ms
       const now = Date.now();
       if (now - lastPublishRef.current > 100) {
-        mqttService.publish('control/joystick/x', -x*100);
-        mqttService.publish('control/joystick/y', y*100);
+        console.log('past: ', now - lastPublishRef.current);
+        mqttService.publish('control/joystick/x', Math.round(-x*100));
+        mqttService.publish('control/joystick/y', Math.round(y*100));
         lastPublishRef.current = now;
       }
     };
