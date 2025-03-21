@@ -90,8 +90,8 @@ const Joystick = () => {
         }, 50);
       }
       position.current = { x: 0, y: 0 };
-      mqttService.publish('control/joystick/x', 0.0);
-      mqttService.publish('control/joystick/y', 0.0);
+      mqttService.publish('control/joystick/x', 0);
+      mqttService.publish('control/joystick/y', 0);
     };
 
     const container = containerRef.current;

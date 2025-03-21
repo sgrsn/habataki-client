@@ -68,8 +68,8 @@ const useGamepad = () => {
 
           // 100ms毎にジョイスティックの値をMQTTメッセージとして送信
           if ((now - gamepadState.lastPublishTime) > 100) {
-            mqttService.publish('control/joystick/x', newState.leftStick.x);
-            mqttService.publish('control/joystick/y', newState.leftStick.y);
+            mqttService.publish('control/joystick/x', Math.round(newState.leftStick.x));
+            mqttService.publish('control/joystick/y', Math.round(newState.leftStick.y));
             if(buttonPlus || buttonMinus) {
               mqttService.publish('control/slider', newSliderValue);
             }
