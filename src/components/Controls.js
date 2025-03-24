@@ -38,7 +38,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-1">
       <button
         onClick={handleStartStop}
         className={`h-40 text-2xl rounded-xl text-white font-bold shadow-lg active:shadow-sm transition-all ${
@@ -48,7 +48,7 @@ useEffect(() => {
         {isRunning ? 'Stop' : 'Start'}
       </button>
       
-      <div className="flex flex-col gap-2 touch-auto">
+      <div className="flex flex-col gap-1 touch-auto">
         <label className="text-lg font-medium">Speed: {sliderValue}%</label>
         <input
           type="range"
