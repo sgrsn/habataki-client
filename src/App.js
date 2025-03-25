@@ -5,7 +5,7 @@ import GamepadStatus from './components/GamepadStatus';
 import HeartbeatStatus from './components/HeartbeatStatus';
 import { mqttService } from './services/MqttConnect';
 import { watchdogService } from './services/watchdog';
-import GnssStatus from './components/GnssStatus';
+// import GnssStatus from './components/GnssStatus';
 import TeensyStatus from './components/TeensyStatus';
 
 const App = () => {
@@ -48,7 +48,6 @@ const App = () => {
     <div className="fixed bottom-0 left-0 right-0 bg-white p-2 shadow-lg space-y-2">
       <GamepadStatus />
       <HeartbeatStatus />
-      <GnssStatus />
       <TeensyStatus />
     </div>
   </div>
