@@ -15,11 +15,11 @@ const Controls = () => {
     }
   }, [gamepadState.lastButtonA, gamepadState.lastButtonB]);
 
-useEffect(() => {
-  if (gamepadState.sliderValue !== undefined) {
-    setSliderValue(gamepadState.sliderValue);
-  }
-}, [gamepadState.sliderValue]);
+  useEffect(() => {
+    if (gamepadState.sliderValue !== undefined) {
+      setSliderValue(gamepadState.sliderValue);
+    }
+  }, [gamepadState.sliderValue]);
 
   const handleStartStop = () => {
     setIsRunning(!isRunning);
@@ -41,7 +41,7 @@ useEffect(() => {
     <div className="flex flex-col gap-1">
       <button
         onClick={handleStartStop}
-        className={`h-40 text-2xl rounded-xl text-white font-bold shadow-lg active:shadow-sm transition-all ${
+        className={`h-16 text-lg rounded-xl text-white font-bold shadow-lg active:shadow-sm transition-all ${
           isRunning ? 'bg-red-500 active:bg-red-600' : 'bg-green-500 active:bg-green-600'
         }`}
       >
