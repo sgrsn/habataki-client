@@ -6,7 +6,10 @@ const ErrorCode = {
   NO_ERROR: 0,
   SUCCESS: 1,
   FAILED: 2,
-  TIMEOUT: 3
+  TIMEOUT: 3,
+  INITIALIZED: 4,
+  SAVING: 5,
+  SAVED: 6
 };
 
 // エラーコードの表示名
@@ -14,7 +17,10 @@ const ErrorCodeLabels = {
   0: 'NO_ERROR',
   1: 'SUCCESS',
   2: 'FAILED',
-  3: 'TIMEOUT'
+  3: 'TIMEOUT',
+  4: 'INITIALIZED',
+  5: 'SAVING',
+  6: 'SAVED'
 };
 
 // ステータスによって表示するスタイルを変更
@@ -28,6 +34,12 @@ const getStatusStyle = (status) => {
       return 'bg-red-200 text-red-700';
     case ErrorCode.TIMEOUT:
       return 'bg-yellow-200 text-yellow-700';
+    case ErrorCode.INITIALIZED:
+      return 'bg-blue-200 text-blue-700';
+    case ErrorCode.SAVING:
+      return 'bg-orange-200 text-orange-700';
+    case ErrorCode.SAVED:
+      return 'bg-green-200 text-green-700';
     default:
       return 'bg-gray-200 text-gray-700';
   }
@@ -49,8 +61,8 @@ const TeensyStatus = () => {
       if (!isNaN(statusValue)) {
         // ビットフィールドからステータスを抽出
         const vectornavStatus = statusValue & 0x03;
-        const sdcardStatus = (statusValue >> 2) & 0x03;
-        const gnssFixStatus = (statusValue >> 4) & 0x03;
+        const sdcardStatus = (statusValue >> 2) & 0x07;
+        const gnssFixStatus = (statusValue >> 5) & 0x03;
         
         setEdgeStatus({
           vectornav: vectornavStatus,
